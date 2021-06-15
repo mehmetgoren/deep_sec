@@ -1,3 +1,5 @@
+# Add as a submodule later: https://github.com/timesler/facenet-pytorch
+
 from facenet_pytorch import MTCNN, InceptionResnetV1
 import torch
 from torch.utils.data import DataLoader

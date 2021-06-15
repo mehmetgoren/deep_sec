@@ -1,3 +1,4 @@
+# Add as a submodule later: https://github.com/mikel-brostrom/Yolov5_DeepSort_Pytorch
 import numpy as np
 # todo: please move all numpy codes to GPU by pytorch if you go to enterpirse for this feature
 # todo: ek olarak cos similarty ile bulduğumuz class ve score' u deepsort ve tarcker' a parametreye taşıyarak gereksiz cos sim işleminden kurtul

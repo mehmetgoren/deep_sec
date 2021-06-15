@@ -1,3 +1,5 @@
+# Add as a submodule later: https://github.com/zeusees/License-Plate-Detector
+
 import torch
 import numpy as np
 from lpd.layers.functions.prior_box import PriorBox
