@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 import cv2
-from system.utilities import DetectedObject, CocoDetectedObject
+from system.utilities import DetectedObject
 from system.object_storages import DiskStorage
 
 

@@ -1,6 +1,6 @@
 from system.stream_plugins import ImageUrlPlugin, ImageFolderPlugin
 from system.object_framers import CropObjectFramer, DrawObjectFramer
-from system.object_detectors import ObjectDetector, OnceDetector, TrackIdOnceDetector, SsimDetector
+from system.object_detectors import ObjectDetector, OnceDetector, LpdDetector, TrackIdOnceDetector, SsimDetector
 from system.image_handlers import ShowImageHandler, SaveImageHandler
 from system.object_storages import InMemoryStorage
 import torch
@@ -62,13 +62,8 @@ def track_test():
     # wait_for_it = input()
 
 
-# todo: bu kısım daha esnek bir detect info2 ya ihtiyaç duyuyor, onu sadece coco names ile sınırlı kılamayız
-# todo: bunun için framer ve handler' ların modifiye olması gerel. Ayrıca lpd detector için de bu gerekli.
-# todo: her şey commit olduktan sonra bununla ilgilendcek ve bu mesaj kaldırılacak
-# todo: burada da artık framer ve handler kullanılıp, import düzenlenecek
 def lpd_test():
-    # todo: gerekli işlemlerden sonra burası kaldırılacak
-    from lpd.detect import detect_boxes_and_labels
+    # from lpd.detect import detect_boxes_and_labels
     import cv2
     test_img_dirs = '../lpd/imgs/turkish'
     img_dirs = os.path.expanduser(test_img_dirs)
@@ -76,11 +71,21 @@ def lpd_test():
 
     while not pl.closed():
         img = pl.get_img()
-        infos = detect_boxes_and_labels(img)
+
+        detector = LpdDetector()
+        storage = InMemoryStorage()
+        framer = CropObjectFramer()  # DrawObjectFramer()
+        handler = ShowImageHandler(1, True)
+
+        #detector.get_detect_boxes(img, storage)
+
+        infos = framer.frame(detector, storage, img)  # detect_boxes_and_labels(img)
         for info in infos:
-            y1, y2, x1, x2 = int(info.box[1]), int(info.box[3]), int(info.box[0]), int(info.box[2])
-            sub_img = img[y1:y2, x1:x2]
-            cv2.imshow(info.label, sub_img)
+            handler.handle(info)
+            print(info.get_text())
+            # y1, y2, x1, x2 = int(info.box[1]), int(info.box[3]), int(info.box[0]), int(info.box[2])
+            # sub_img = img[y1:y2, x1:x2]
+            # cv2.imshow(info.label, sub_img)
             if cv2.waitKey(1000000) & 0xFF == ord('q'):
                 continue
 

@@ -13,7 +13,6 @@ import argparse
 import cv2
 import pytesseract
 from typing import List
-import os
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 

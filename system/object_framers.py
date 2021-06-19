@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import List
-from system.object_detectors import ObjectDetectorBase, DetectedObject, CocoDetectedObject
+from system.object_detectors import ObjectDetectorBase, DetectedObject
 from system.object_storages import ObjectStorageBase
 import numpy as np
 import cv2
@@ -19,7 +19,7 @@ class DrawObjectFramer(ObjectFramerBase):
         boxes = object_detector.get_detect_boxes(img, storage)
         for i in range(len(boxes)):
             box = boxes[i]
-            di: CocoDetectedObject = object_detector.create_detectedObject(box)
+            di = object_detector.create_detectedObject(box)
             di.img = img
             dis.append(di)
             color = di.get_pred_color()

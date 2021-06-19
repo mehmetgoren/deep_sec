@@ -50,9 +50,9 @@ def capture_save():
                 handler.handle(info)
 
 
-with torch.no_grad():
-    capture_show()
-    capture_save()
+# with torch.no_grad():
+#     # capture_show()
+#     capture_save()
 
 # it is tracing from here
 from object_trackers.object_tracker import ObjectTracker

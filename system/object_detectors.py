@@ -2,6 +2,7 @@ from system.object_storages import ObjectStorageBase
 from system.utilities import device, half, DetectedObject, CocoDetectedObject
 from abc import ABC, abstractmethod
 from object_trackers.object_tracker import ObjectTracker
+from lpd.detect import detect_boxes_and_labels
 import torch
 import torch.nn as nn
 import numpy as np
@@ -150,7 +151,48 @@ class TrackIdOnceDetector(ObjectDetectorBase):
         return _create_coco_detected_object(box)
 
 
-# todo: bir TrackIdDetector a daha ihtiyac var, once olmayan
+class TrackIdDetector(ObjectDetectorBase):
+    def __init__(self):
+        super(TrackIdDetector, self).__init__()
+        self.tracker = ObjectTracker()
+
+    def get_detect_boxes(self, img, storage: ObjectStorageBase):
+        detected_boxes = self._get_detect_boxes(img)
+        detecteds = self.tracker.detect(img, detected_boxes)
+        arr = []
+        for j, detected in enumerate(detecteds):
+            arr.append(detected_boxes[j])
+            print(f'detected {detected.track_id} {detected.pred_cls}-{detected.pred_score} at {datetime.now()}')
+            self.hash.add(detected.track_id)
+        if not len(arr):
+            return torch.empty(0)
+        ret = torch.zeros((len(arr), 6))
+        for j, item in enumerate(arr):
+            ret[j] = item
+        return ret
+
+    def create_detectedObject(self, box) -> CocoDetectedObject:
+        return _create_coco_detected_object(box)
+
+
+class LpdDetector(ObjectDetectorBase):
+    def __init__(self):
+        super(LpdDetector, self).__init__()
+
+    def get_detect_boxes(self, img, storage: ObjectStorageBase):
+        ret = []
+        detecteds = detect_boxes_and_labels(img)
+        for detected in detecteds:
+            box = detected.box
+            arr = [box[0], box[1], box[2], box[3], detected.label]
+            ret.append(arr)
+        return ret
+
+    def create_detectedObject(self, box) -> DetectedObject:
+        x1, y1, x2, y2, label = box
+        obj = DetectedObject()
+        obj.text = label
+        return obj
 
 
 # todo: implement it with redis later.
