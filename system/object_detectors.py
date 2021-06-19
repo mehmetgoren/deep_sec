@@ -1,5 +1,5 @@
 from system.object_storages import ObjectStorageBase
-from system.utilities import device, half, DetectedObject
+from system.utilities import device, half, DetectedObject, CocoDetectedObject
 from abc import ABC, abstractmethod
 from object_trackers.object_tracker import ObjectTracker
 import torch
@@ -38,13 +38,28 @@ class ObjectDetectorBase(ABC):
     def get_detect_boxes(self, img, storage: ObjectStorageBase):
         pass
 
+    @abstractmethod
+    def create_detectedObject(self, box) -> CocoDetectedObject:
+        pass
+
+
+def _create_coco_detected_object(box) -> CocoDetectedObject:
+    x1, y1, x2, y2, confidence, cls = box
+    obj = CocoDetectedObject()
+    obj.pred_score = confidence.item()
+    obj.pred_cls_indx = int(cls.item())
+    return obj
+
 
 class ObjectDetector(ObjectDetectorBase):
     def get_detect_boxes(self, img: np.array, storage: ObjectStorageBase):
         return self._get_detect_boxes(img)
 
+    def create_detectedObject(self, box) -> CocoDetectedObject:
+        return _create_coco_detected_object(box)
 
-# todo: add white list
+
+# todo: add white list for coco object types.
 class OnceDetector(ObjectDetectorBase):
     def __init__(self):
         super(OnceDetector, self).__init__()
@@ -65,7 +80,6 @@ class OnceDetector(ObjectDetectorBase):
         result = self.cos(img1, img2)
         return result.item()
 
-    # get boxes numpy mi yoksa torch mu bir bakalım.
     def get_detect_boxes(self, img: np.array, storage: ObjectStorageBase):
         boxes = self._get_detect_boxes(img)
         arr = []
@@ -78,6 +92,7 @@ class OnceDetector(ObjectDetectorBase):
             for detected in detected_list:
                 if detected.pred_cls_indx != cls_idx:
                     continue
+                # todo: you may open it later if it increase the accuracy
                 # elif abs(detected.pred_score.item() - conf.item()) > .1:
                 #     continue
                 img2 = detected.img  # it stores DetectedImage
@@ -89,7 +104,10 @@ class OnceDetector(ObjectDetectorBase):
             # if it is not detected before
             if not already_detected:
                 arr.append(box)
-                do = DetectedObject(img1, conf, cls_idx)
+                do = self.create_detectedObject(box)
+                do.img = img1
+                do.pred_score = conf
+                do.pred_cls_indx = cls_idx
                 storage.add(do)
         if not len(arr):
             return torch.empty(0)
@@ -98,10 +116,13 @@ class OnceDetector(ObjectDetectorBase):
             ret[j] = item
         return ret
 
+    def create_detectedObject(self, box) -> CocoDetectedObject:
+        return _create_coco_detected_object(box)
 
-class TrackIdDetector(ObjectDetectorBase):
+
+class TrackIdOnceDetector(ObjectDetectorBase):
     def __init__(self):
-        super(TrackIdDetector, self).__init__()
+        super(TrackIdOnceDetector, self).__init__()
         self.hash = set()
         self.tracker = ObjectTracker()
 
@@ -125,6 +146,12 @@ class TrackIdDetector(ObjectDetectorBase):
             ret[j] = item
         return ret
 
+    def create_detectedObject(self, box) -> CocoDetectedObject:
+        return _create_coco_detected_object(box)
+
+
+# todo: bir TrackIdDetector a daha ihtiyac var, once olmayan
+
 
 # todo: implement it with redis later.
 class SsimDetector(ObjectDetectorBase):
@@ -142,7 +169,8 @@ class SsimDetector(ObjectDetectorBase):
             sub_img = img[y1:y2, x1:x2]
             pred_score = box[4]
             cls_index = int(box[5])
-            di = DetectedObject(sub_img, pred_score, cls_index)
+            di = _create_coco_detected_object(box)
+            di.img = sub_img
             if not self._detected_before(di, self.dic):
                 arr.append(box)
         if not len(arr):
@@ -151,6 +179,9 @@ class SsimDetector(ObjectDetectorBase):
         for j, item in enumerate(arr):
             ret[j] = item
         return ret
+
+    def create_detectedObject(self, box) -> DetectedObject:
+        return _create_coco_detected_object(box)
 
     @staticmethod
     def _ssim(img1, img2, make_it_grayscale=False) -> float:
@@ -161,7 +192,7 @@ class SsimDetector(ObjectDetectorBase):
         loss = sk_ssim(img1, img2)
         return loss
 
-    def _detected_before_mt(self, detected: DetectedObject, detected_dic: Dict, threshold=1. / 5.) -> bool:
+    def _detected_before_mt(self, detected: CocoDetectedObject, detected_dic: Dict, threshold=1. / 5.) -> bool:
         # make it grayscale before processing
         img = cv2.cvtColor(detected.img, cv2.COLOR_BGR2GRAY)
         if not detected.pred_cls in detected_dic:
@@ -191,7 +222,7 @@ class SsimDetector(ObjectDetectorBase):
             detected_imgs.append(img)
         return result
 
-    def _detected_before(self, detected: DetectedObject, detected_dic, threshold=1. / 5.) -> bool:
+    def _detected_before(self, detected: CocoDetectedObject, detected_dic, threshold=1. / 5.) -> bool:
         # make it grayscale before processing
         img = cv2.cvtColor(detected.img, cv2.COLOR_BGR2GRAY)
         if not detected.pred_cls in detected_dic:

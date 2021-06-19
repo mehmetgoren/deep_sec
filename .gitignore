@@ -111,6 +111,11 @@ History
 *.pt
 *.zip
 *.7z
+__pycache__/
+*.pyc
+*__pycache__*
+
+
 
 
 

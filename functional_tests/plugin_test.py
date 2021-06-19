@@ -2,13 +2,14 @@ import torch
 import time
 from system.stream_plugins import WebcamPlugin, YoutubePlugin, DahuaDvrPlugin
 from system.object_framers import CropObjectFramer, DrawObjectFramer
-from system.object_detectors import ObjectDetector, OnceDetector, TrackIdDetector, SsimDetector
+from system.object_detectors import ObjectDetector, OnceDetector, TrackIdOnceDetector, SsimDetector
 from system.image_handlers import ShowImageHandler, SaveImageHandler
 from system.object_storages import InMemoryStorage
 from system.utilities import DetectedObject
 
 url = 'https://www.youtube.com/watch?v=bBj7QqmFNPw'  # 'https://www.youtube.com/watch?v=OwAQB52Hv4M' # 'https://www.youtube.com/watch?v=bBj7QqmFNPw' #'https://www.youtube.com/watch?v=sPVlw5Zhr7k'
 plugin = YoutubePlugin(url)  # DahuaDvrPlugin()  # YoutubePlugin(url)  # WebcamPlugin()
+
 
 def capture_show(frame_rate=30):
     detector = ObjectDetector()
@@ -25,10 +26,12 @@ def capture_show(frame_rate=30):
             infos = framer.frame(detector, storage, img)
             if len(infos):
                 for info in infos:
-                    print(f'{info.pred_cls} - {info.pred_score}')
+                    print(info.get_text())
                     handler.handle(info)
             else:  # show even nothing is detected
-                o = DetectedObject(img, 1., 1)
+                o = DetectedObject()
+                o.img = img
+                o.text = "1"
                 handler.handle(o)
 
 
@@ -43,7 +46,7 @@ def capture_save():
         infos = framer.frame(detector, storage, img)
         if len(infos):
             for info in infos:
-                print(f'{info.pred_cls} - {info.pred_score}')
+                print(info.get_text())
                 handler.handle(info)
 
 
@@ -67,10 +70,12 @@ def track_test():
         infos = tracker.detect(img, boxes)
         if len(infos):
             for info in infos:
-                print(f'{info.pred_cls} - {info.pred_score} - {info.track_id}')
+                print(info.get_text())
                 handler.handle(info)
         else:  # show even nothing is detected
-            o = DetectedObject(img, 1., 1)
+            o = DetectedObject()
+            o.img = img
+            o.text = "1"
             handler.handle(o)
 
 

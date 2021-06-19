@@ -1,6 +1,6 @@
 from system.stream_plugins import ImageUrlPlugin, ImageFolderPlugin
 from system.object_framers import CropObjectFramer, DrawObjectFramer
-from system.object_detectors import ObjectDetector, OnceDetector, TrackIdDetector, SsimDetector
+from system.object_detectors import ObjectDetector, OnceDetector, TrackIdOnceDetector, SsimDetector
 from system.image_handlers import ShowImageHandler, SaveImageHandler
 from system.object_storages import InMemoryStorage
 import torch
@@ -19,7 +19,7 @@ def test1():
 
     infos = framer.frame(detector, storage, img)
     for info in infos:
-        print(f'{info.pred_cls} - {info.pred_score}')
+        print(info.get_text())
         handler.handle(info)
 
 
@@ -27,7 +27,7 @@ def test2():
     pl = ImageUrlPlugin('https://raw.githubusercontent.com/ultralytics/yolov5/master/data/images/zidane.jpg')
     img = pl.get_img()
 
-    detector = OnceDetector() # SsimDetector() # TrackIdDetector()
+    detector = OnceDetector()  # SsimDetector() # TrackIdOnceDetector()
     storage = InMemoryStorage()
     framer = CropObjectFramer()
     handler = SaveImageHandler()  # ShowImageHandler(0)
@@ -35,7 +35,7 @@ def test2():
     while 1:
         infos = framer.frame(detector, storage, img)
         for info in infos:
-            print(f'{info.pred_cls} - {info.pred_score}')
+            print(info.get_text())
             handler.handle(info)
         time.sleep(1)
 
@@ -56,10 +56,11 @@ def track_test():
         boxes = detector.get_detect_boxes(img, storage)
         infos = tracker.detect(img, boxes)
         for info in infos:
-            print(f'{info.pred_cls} - {info.pred_score} - {info.track_id}')
+            print(info.get_text())
             handler.handle(info)
         time.sleep(1)
     # wait_for_it = input()
+
 
 # todo: bu kısım daha esnek bir detect info2 ya ihtiyaç duyuyor, onu sadece coco names ile sınırlı kılamayız
 # todo: bunun için framer ve handler' ların modifiye olması gerel. Ayrıca lpd detector için de bu gerekli.
@@ -84,9 +85,8 @@ def lpd_test():
                 continue
 
 
-
 with torch.no_grad():
-    # test1()
-    # test2()
-    # track_test()
+    test1()
+    test2()
+    track_test()
     lpd_test()

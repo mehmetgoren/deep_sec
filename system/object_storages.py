@@ -4,18 +4,11 @@ from addict import Dict
 from redis import Redis
 from typing import List
 import cv2
-from datetime import datetime
 import os
 from pathlib import Path
 
 
 class ObjectStorageBase(ABC):
-
-    def _create_unique_key(self, detected: DetectedObject):
-        now = datetime.now().strftime('%Y_%m_%d_%H_%M_%S_%f')[:-3]
-        key = f'{detected.pred_cls_indx}_{int(detected.pred_score * 100.)}_{now}'
-        return key
-
     @abstractmethod
     def add(self, detected: DetectedObject):
         pass
@@ -30,7 +23,7 @@ class InMemoryStorage(ObjectStorageBase):
         self.dic = Dict()
 
     def add(self, detected: DetectedObject):
-        key = self._create_unique_key(detected)
+        key = detected.create_unique_key(detected)
         print('dic count: ', len(self.dic))
         self.dic[key] = detected
 
@@ -62,8 +55,8 @@ class RedisStorage(ObjectStorageBase):
     #     return a
 
     def add(self, detected: DetectedObject):
-        key = self._create_unique_key(detected)
-        img_to_bytes = cv2.imencode('.jpg', detected.img)[1].tobytes()
+        key = detected.create_unique_key(detected)
+        # img_to_bytes = cv2.imencode('.jpg', detected.img)[1].tobytes()
         # redis_cache.set('frame', frame_to_bytes)
         self.redis_client.set(key, detected)  # frame olmalı img
 
@@ -79,7 +72,7 @@ class DiskStorage(ObjectStorageBase):
         self.folder_name = f'{resources_path}/delete_later'
 
     def add(self, detected: DetectedObject):
-        file_name = f'{self.folder_name}/{self._create_unique_key(detected)}.{self.file_extension}'
+        file_name = f'{self.folder_name}/{detected.create_unique_key(detected)}.{self.file_extension}'
         cv2.imwrite(file_name, detected.img)
 
     @staticmethod
