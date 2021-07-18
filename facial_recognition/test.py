@@ -53,7 +53,7 @@ cv2.destroyAllWindows()
 
 # Load a single image and display
 v_cap = cv2.VideoCapture(
-    '/mnt/37c00eec-d043-4088-b730-36c9e48a38e4/facial_recognition/facenet_pytorch/examples/video.mp4')
+    '/mnt/sdc1/facial_recognition/facenet_pytorch/examples/video.mp4')
 success, cv2_img = v_cap.read()
 frame = cv2.cvtColor(cv2_img, cv2.COLOR_BGR2RGB)
 frame = Image.fromarray(frame)

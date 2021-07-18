@@ -1,5 +1,5 @@
 DEEPSORT:
-  REID_CKPT: "/mnt/37c00eec-d043-4088-b730-36c9e48a38e4/deep_sec/object_trackers/deep_sort/checkpoint/ckpt.t7"
+  REID_CKPT: "/mnt/sdc1/deep_sec/object_trackers/deep_sort/checkpoint/ckpt.t7"
   MAX_DIST: 0.2
   MIN_CONFIDENCE: 0.3
   NMS_MAX_OVERLAP: 0.5

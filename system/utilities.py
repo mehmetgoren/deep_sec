@@ -8,7 +8,7 @@ from datetime import datetime
 device = torch.device('cuda:0')
 half = device.type != 'cpu'
 
-resources_path = '/mnt/37c00eec-d043-4088-b730-36c9e48a38e4/deep_sec/resources'
+resources_path = '/mnt/sdc1/deep_sec/resources'
 coco_names_path = resources_path + '/coco_names.txt'
 
 

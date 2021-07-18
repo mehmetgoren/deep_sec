@@ -8,7 +8,7 @@ alias deactivate 'test $?_OLD_VIRTUAL_PATH != 0 && setenv PATH "$_OLD_VIRTUAL_PA
 # Unset irrelevant variables.
 deactivate nondestructive
 
-setenv VIRTUAL_ENV "/mnt/37c00eec-d043-4088-b730-36c9e48a38e4/facial_recognition/facenet-pytorch/venv"
+setenv VIRTUAL_ENV "/mnt/sdc1/facial_recognition/facenet-pytorch/venv"
 
 set _OLD_VIRTUAL_PATH="$PATH"
 setenv PATH "$VIRTUAL_ENV/bin:$PATH"

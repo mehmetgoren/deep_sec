@@ -37,7 +37,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="/mnt/37c00eec-d043-4088-b730-36c9e48a38e4/facial_recognition/facenet-pytorch/venv"
+VIRTUAL_ENV="/mnt/sdc1/facial_recognition/facenet-pytorch/venv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"

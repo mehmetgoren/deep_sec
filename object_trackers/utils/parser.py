@@ -28,7 +28,7 @@ class YamlParser(dict):
 
 
 def get_config(
-        config_file='/mnt/37c00eec-d043-4088-b730-36c9e48a38e4/deep_sec/object_trackers/configs/deep_sort.yaml'):
+        config_file='/mnt/sdc1/deep_sec/object_trackers/configs/deep_sort.yaml'):
     return YamlParser(config_file=config_file)
 
 # if __name__ == "__main__":

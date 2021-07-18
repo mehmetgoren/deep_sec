@@ -24,7 +24,7 @@ def collate_fn(x):
 
 
 dataset = datasets.ImageFolder(
-    '/mnt/37c00eec-d043-4088-b730-36c9e48a38e4/facial_recognition/facenet_pytorch/data/test_images')
+    '/mnt/sdc1/facial_recognition/facenet_pytorch/data/test_images')
 dataset.idx_to_class = {i: c for c, i in dataset.class_to_idx.items()}
 loader = DataLoader(dataset, collate_fn=collate_fn, num_workers=workers)
 

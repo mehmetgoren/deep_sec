@@ -29,7 +29,7 @@ end
 # unset irrelevant variables
 deactivate nondestructive
 
-set -gx VIRTUAL_ENV "/mnt/37c00eec-d043-4088-b730-36c9e48a38e4/facial_recognition/facenet-pytorch/venv"
+set -gx VIRTUAL_ENV "/mnt/sdc1/facial_recognition/facenet-pytorch/venv"
 
 set -gx _OLD_VIRTUAL_PATH $PATH
 set -gx PATH "$VIRTUAL_ENV/bin" $PATH

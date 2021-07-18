@@ -1,4 +1,4 @@
-#!/mnt/37c00eec-d043-4088-b730-36c9e48a38e4/facial_recognition/facenet-pytorch/venv/bin/python
+#!/mnt/sdc1/facial_recognition/facenet-pytorch/venv/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys
